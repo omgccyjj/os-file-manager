@@ -213,7 +213,9 @@ void write(string namein)
 		}
 	}
 	else
+	{
 		cout << "未找到文件" ;
+	}
 }
 
 //新建文件
@@ -379,7 +381,7 @@ void copyFile(string filename_and_path)
 		cout << "源文件不存在" ;
 		return;
 	}
-	if (!existRecentFolder(target_file))
+	if (existRecentFolder(target_file))
 	{
 		string I;
 		cout << "目标文件已存在" ;
