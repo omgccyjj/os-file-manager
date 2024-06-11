@@ -152,7 +152,8 @@ void help()
     cout << "8. delete + file_name 删除文件/文件夹\n";
     cout << "9. rename + old_name + new_name 重命名文件/文件夹\n";
 	cout << "10. copy + source_file_name + target_file_name\n";
-    cout << "11. exit 退出系统\n";
+	cout << "11. mov + source_file_name + target_file_name\n";
+    cout << "12. exit 退出系统\n";
     cout << "------------------------------------------------------------------------\n";
     cout << endl;
 }
@@ -279,6 +280,44 @@ void creatFile(string name)
 	else
 	{
 		cout << "命名冲突" ;
+	}
+}
+
+void moveFile(string name_and_path)
+{
+	string source_file, target_file;
+	for (auto i = 0; i < name_and_path.size(); i++)
+	{
+		if (name_and_path[i] == ' ')
+		{
+			source_file = name_and_path.substr(0, i);
+			target_file = name_and_path.substr(i + 1);
+			break;
+		}
+	}
+	if (!existRecentFolder(source_file))
+	{
+		cout << "未找到文件" ;
+		return;
+	}
+	if (existRecentFolder(target_file))
+	{
+		string I;
+		cout << ">已存在同名文件, 是否覆盖<y, n>:";
+		cin >> I;
+		if (I != "y")
+		{
+			return;
+		}
+	}
+	// 使用system 函数移动文件
+	if (system(("mv " + source_file + " " + target_file).data()) == 0)
+	{
+		cout << "移动成功";
+	}
+	else
+	{
+		cout << "移动失败";
 	}
 }
 
@@ -431,7 +470,7 @@ void copyFile(string filename_and_path)
 	if (existRecentFolder(target_file))
 	{
 		string I;
-		cout << "目标文件已存在" ;
+		cout << ">目标文件已存在," ;
 		cout << "是否覆盖<y, n>:" ;
 		cin >> I;
 		if (I != "y")
@@ -583,6 +622,9 @@ void shell()
 			break;
 		case "copy"_hash:
 			copyFile(option);
+			break;
+		case "mov"_hash:
+			moveFile(option);
 			break;
 		default:
 			cout << "无效命令" ;
