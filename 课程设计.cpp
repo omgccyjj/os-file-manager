@@ -213,9 +213,7 @@ void write(string namein)
 		}
 	}
 	else
-	{
 		cout << "未找到文件" ;
-	}
 }
 
 //新建文件
@@ -381,7 +379,7 @@ void copyFile(string filename_and_path)
 		cout << "源文件不存在" ;
 		return;
 	}
-	if (existRecentFolder(target_file))
+	if (!existRecentFolder(target_file))
 	{
 		string I;
 		cout << "目标文件已存在" ;
@@ -438,7 +436,7 @@ void renameFile(string option)
                 {
                     (*i).name = newName;
                     (*i).src = recent_ptr->src + "/" + newName;
-                    string command = "mv " + oldName + " " + newName;
+                    string command = "rename " + oldName + " " + newName;
                     system(command.data());
                     cout << "重命名成功!" << endl;
                     return;
