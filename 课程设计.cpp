@@ -136,17 +136,17 @@ void open(string namein)
 			if ((*i).name == namein && (*i).filetype == 1) //类型判断
 			{
 				ofstream filestream(namein.data());
-				cout << "访问成功!";
+				cout << "访问成功!\n";
 			}
 			else if ((*i).name == namein && (*i).filetype == 0)
 			{
-				cout << "不支持对文件夹操作";
+				cout << "不支持对文件夹操作\n";
 				return;
 			}
 	}
 	else
 	{
-		cout << "未找到文件" ;
+		cout << "未找到文件\n" ;
 	}
 }
 
@@ -162,7 +162,7 @@ void read(string namein)
 				ifstream filestream(namein.data());
 				if (!filestream.is_open())
 				{
-					cout << "文件打开失败"; exit(1);
+					cout << "文件打开失败\n"; exit(1);
 				}
 				while (!filestream.eof())
 				{
@@ -174,14 +174,14 @@ void read(string namein)
 			}
 			else if ((*i).name == namein && (*i).filetype == 0)
 			{
-				cout << "不支持对文件夹操作" ;
+				cout << "不支持对文件夹操作\n" ;
 				return;
 			}
 		}
 	}
 	else
 	{
-		cout << "未找到文件";
+		cout << "未找到文件\n";
 	}
 }
 
@@ -203,18 +203,22 @@ void write(string namein)
 					filestream << content ;
 					filestream.close();
 					getchar();
-					cout << "写入成功！";
+					cout << "写入成功！\n";
 				}
 			}
 			else if ((*i).name == namein && (*i).filetype == 0)
 			{
-				cout << "不支持对文件夹操作";
+				cout << "不支持对文件夹操作\n";
 				return;
 			}
 		}
 	}
 	else
-		cout << "未找到文件" ;
+
+	{
+		cout << "未找到文件\n" ;
+	}
+
 }
 
 //新建文件
@@ -231,11 +235,11 @@ void creatFile(string name)
 		recent_ptr->children.push_back(IN);
 		ofstream filestream(name.data());
 		filestream.close();
-		cout << "创建成功！";
+		cout << "创建成功！\n";
 	}
 	else
 	{
-		cout << "命名冲突" ;
+		cout << "命名冲突\n" ;
 	}
 }
 
@@ -293,16 +297,16 @@ void creatFolder(string name)
 		recent_ptr->children.push_back(IN);
 		if (mkdir(name.data()) == 0)
 		{
-			cout << "创建成功！";
+			cout << "创建成功！\n";
 		}
 		else
 		{
-			cout << "创建失败";
+			cout << "创建失败\n";
 		}
 	}
 	else
 	{
-		cout << "命名冲突" ;
+		cout << "命名冲突\n" ;
 		return;
 	}
 }
@@ -315,7 +319,7 @@ void init() {
         root.grade = 0;
         root.name = "root";
         if (mkdir("root") != 0) {
-            cout << "根目录已存在，尝试加载文件系统状态" << endl;
+            cout << "根目录已存在，尝试加载文件系统状态\n" << endl;
             chdir("root");
             ifstream infile("file-system.txt");
             if (infile.is_open()) {
@@ -373,16 +377,16 @@ void cd(string address)
 		}
 		else if (file_exist && !is_folder)
 		{
-			cout << "不支持对文件操作";
+			cout << "不支持对文件操作\n";
 			return;
 		}
 		else if (!file_exist)
 		{
-			cout << "未找到文件夹" ;
+			cout << "未找到文件夹\n" ;
 			return;
 		}
 	}
-	cout << "切换成功!";
+	cout << "切换成功!\n";
 }
 
 //ls
@@ -396,7 +400,7 @@ void dir()
 	}
 	else
 	{
-		cout << "空目录";
+		cout << "空目录\n";
 	}
 }
 
@@ -415,7 +419,7 @@ void copyFile(string filename_and_path)
 	}
 	if (!existRecentFolder(source_file))
 	{
-		cout << "源文件不存在" ;
+		cout << "源文件不存在\n" ;
 		return;
 	}
 	if (!existRecentFolder(target_file))
@@ -431,7 +435,7 @@ void copyFile(string filename_and_path)
 	}
 	string command = "copy " + filename_and_path;
 	system(command.data());
-	cout << "复制成功!";
+	cout << "复制成功!\n";
 }
 
 //删除文件
@@ -446,14 +450,14 @@ void deleteFile(string namein)
 				recent_ptr->children.erase(i);
 				string command = "rm -rf " + namein;
 				system(command.data());
-				cout << "删除成功!";
+				cout << "删除成功!\n";
 				return;
 			}
 		}
 	}
 	else
 	{
-		cout << "权限检查失败" ;
+		cout << "权限检查失败\n" ;
 		return;
 	}
 }
@@ -477,19 +481,19 @@ void renameFile(string option)
                     (*i).src = recent_ptr->src + "/" + newName;
                     string command = "rename " + oldName + " " + newName;
                     system(command.data());
-                    cout << "重命名成功!" << endl;
+                    cout << "重命名成功!\n" << endl;
                     return;
                 }
             }
         }
         else
         {
-            cout << "文件不存在" << endl;
+            cout << "文件不存在\n" << endl;
         }
     }
     else
     {
-        cout << "重命名命令格式错误, 应为: rename old_name new_name" << endl;
+        cout << "重命名命令格式错误, 应为: rename old_name new_name\n" << endl;
     }
 }
 
@@ -501,7 +505,7 @@ void exit() {
         root.saveToFile(outfile);
         outfile.close();
     } else {
-        cout << "无法打开文件来保存文件系统状态，或未找到file-system.txt" << endl;
+        cout << "无法打开文件来保存文件系统状态 或未找到file-system.txt\n" << endl;
     }
     
     for (int i = recent_grade + 1; i != 0; i--) {
@@ -509,85 +513,71 @@ void exit() {
     }
 
     // system("rm -rf root");
-    cout << "目录删除成功!即将退出系统." << endl;
+    cout << "目录删除成功!即将退出系统.\n" << endl;
     exit(0);
 }
 
 //命令解释
-void shell()
-{
-	int orders;
-	string order, option, command;
-	cout << ">";
-	getline(cin, order);
-	for (auto i = 0; i != order.size(); i++)
-	{
-		if (order[i] == ' '&&i != order.size() - 1)
-		{
-			command = order.substr(0, i);
-			option = order.substr(i + 1, order.size());
-			break;
-		}
-		else if (i == order.size() - 1)
-		{
-			command = order;
-			break;
-		}
-	}
+void shell() {
+    while (1) {
+        string line;
+        cout << recent_ptr->src << " > "; // 显示当前位置路径
+        getline(cin, line);
 
-	/* cpp不让string直接用switch-case */
-	switch (hash_(command.c_str()))
-	{
-		case "help"_hash:
-			help();
-			break;
-		case "touch"_hash:
-			creatFile(option);
-			break;
-		case "mkdir"_hash:
-			creatFolder(option);
-			break;
-		case "cd"_hash:
-			cd(option);
-			break;
-		case "dir"_hash:
-			dir();
-			break;
-		case "open"_hash:
-			open(option);
-			break;
-		case "write"_hash:
-			write(option);
-			break;
-		case "read"_hash:
-			read(option);
-			break;
-		case "delete"_hash:
-			deleteFile(option);
-			break;
-		case "rename"_hash:
-			renameFile(option);
-			break;
-		case "exit"_hash:
-			exit();
-			break;
-		case "copy"_hash:
-			copyFile(option);
-			break;
-		case "mov"_hash:
-			moveFile(option);
-			break;
-		default:
-			cout << "无效命令" ;
-			break;
-	}
-	cout << endl;
+        size_t len = line.size();
+        if (len == 0) continue;
+
+        size_t first_space = line.find(' ');
+        string command = line.substr(0, first_space);
+        string arg = (first_space == string::npos) ? "" : line.substr(first_space + 1);
+
+        switch (hash_(command.c_str())) {
+        case "help"_hash:
+            help();
+            break;
+        case "touch"_hash:
+            creatFile(arg);
+            break;
+        case "mkdir"_hash:
+            creatFolder(arg);
+            break;
+        case "open"_hash:
+            open(arg);
+            break;
+        case "read"_hash:
+            read(arg);
+            break;
+        case "write"_hash:
+            write(arg);
+            break;
+        case "delete"_hash:
+            deleteFile(arg);
+            break;
+        case "cd"_hash:
+            cd(arg);
+            break;
+        case "dir"_hash:
+            dir();
+            break;
+        case "rename"_hash:
+            renameFile(arg);
+            break;
+        case "copy"_hash:
+            copyFile(arg);
+            break;
+        case "exit"_hash:
+            return;
+        default:
+            cout << "未知命令, 输入help查看命令列表\n";
+        }
+    }
 }
+
 
 int main()
 {
 	init();
-	cout << "输入help查看命令" << endl;
+	cout << "输入help查看命令\n" << endl;
 	while (true)
 	{
 		shell();
