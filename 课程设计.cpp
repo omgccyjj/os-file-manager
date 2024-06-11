@@ -151,20 +151,18 @@ void help()
     cout << "7. read + file_name 读取文件\n";
     cout << "8. delete + file_name 删除文件/文件夹\n";
     cout << "9. rename + old_name + new_name 重命名文件/文件夹\n";
-    cout << "10. exit 退出系统\n";
+	cout << "10. copy + source_file_name + target_file_name\n";
+    cout << "11. exit 退出系统\n";
     cout << "------------------------------------------------------------------------\n";
     cout << endl;
 }
 
 
 
-//扫描输入的文件是否在当前目录中
+/* 使用 access 函数来判断文件是否存在 */
 bool existRecentFolder(string filename)
 {
-	for (auto i = recent_ptr->children.begin(); i != recent_ptr->children.end(); i++)
-		if ((*i).name == filename)
-			return true;
-	return false;
+	return access(filename.data(), F_OK) == 0;
 }
 
 //打开文件
@@ -410,9 +408,38 @@ void dir()
 	}
 }
 
+/* :"源文件路径 目的路径" */
 void copyFile(string filename_and_path)
 {
-	
+	string source_file, target_file;
+	for (auto i = 0; i < filename_and_path.size(); i++)
+	{
+		if (filename_and_path[i] == ' ')
+		{
+			source_file = filename_and_path.substr(0, i);
+			target_file = filename_and_path.substr(i + 1);
+			break;
+		}
+	}
+	if (!existRecentFolder(source_file))
+	{
+		cout << "源文件不存在" ;
+		return;
+	}
+	if (!existRecentFolder(target_file))
+	{
+		string I;
+		cout << "目标文件已存在" ;
+		cout << "是否覆盖<y, n>:" ;
+		cin >> I;
+		if (I != "y")
+		{
+			return;
+		}
+	}
+	string command = "copy " + filename_and_path;
+	system(command.data());
+	cout << "复制成功!";
 }
 
 //删除文件
