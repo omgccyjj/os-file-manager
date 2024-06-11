@@ -53,7 +53,10 @@
     "random": "cpp",
     "regex": "cpp",
     "list": "cpp",
-    "iomanip": "cpp"
+    "iomanip": "cpp",
+    "chrono": "cpp",
+    "codecvt": "cpp",
+    "ratio": "cpp"
   },
   "C_Cpp.errorSquiggles": "enabled",
   "editor.inlineSuggest.showToolbar": "onHover"
