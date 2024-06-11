@@ -325,7 +325,7 @@ void init() {
         if (mkdir("root") != 0) {
             cout << "根目录已存在，尝试加载文件系统状态" << endl;
             chdir("root");
-            ifstream infile("filesystem.txt");
+            ifstream infile("file-system.txt");
             if (infile.is_open()) {
                 root.loadFromFile(infile);
                 infile.close();
