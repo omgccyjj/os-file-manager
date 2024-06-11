@@ -127,13 +127,10 @@ void help()
 }
 
 
-//扫描输入的文件是否在当前目录中
+/* 使用 access 函数来判断文件是否存在 */
 bool existRecentFolder(string filename)
 {
-	for (auto i = recent_ptr->children.begin(); i != recent_ptr->children.end(); i++)
-		if ((*i).name == filename)
-			return true;
-	return false;
+	return access(filename.data(), F_OK) == 0;
 }
 
 //打开文件
