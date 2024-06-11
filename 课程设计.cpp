@@ -10,6 +10,8 @@
 #include <cstdio>
 #include <unistd.h>
 #include <direct.h>
+#include <filesystem> // 需要包含这个头文件来使用std::filesystem
+
 using namespace std;
 
 typedef uint64_t hash_t;
@@ -25,33 +27,11 @@ class fileNode
 {
 public:
 	fileNode * father;
-	list<fileNode> children; string owner;
+	list<fileNode> children;
 	string name;
-	bool type[3] = { true,true,true };  //rwx权限，默认为true,true,true
 	string src;
 	int grade;
-	int filetype;
-
-	bool changeType()
-	{
-
-			string a;
-			cout << "输入文件读写状态码，默认状态为-r-w-x(000)" << endl;
-			cin >> a;
-			if (a[0] = 0)
-				type[0] = false;
-			else
-				type[0] = true;
-			if (a[1] = 0)
-				type[1] = false;
-			else
-				type[1] = true;
-			if (a[2] = 0)
-				type[2] = false;
-			else
-				type[2] = true;
-			return true;
-	};
+	int filetype; // 文件类型，0为文件夹，1为文件
 	int fileSize()
 	{
 		struct stat statbuf;
@@ -60,26 +40,10 @@ public:
 
 		return size;
 	};
-	string print_type()
-	{
-		string a;
-		if (type[0])
-			a += "r";
-		else
-			a += "-r";
-		if (type[1])
-			a += "w";
-		else
-			a += "-w";
-		if (type[0])
-			a += "x";
-		else
-			a += "-x";
-		return a;
-	}
+	
 	// 保存文件系统状态，用于持续化存储
 	void saveToFile(ofstream &outfile) {
-		outfile << name << " " << filetype << " " << print_type() << endl;
+		outfile << src << " " << filetype << " " << endl;
 		for (auto &child : children) {
 			child.saveToFile(outfile);
 		}
@@ -87,26 +51,23 @@ public:
 
 	// 加载文件系统状态
 	void loadFromFile(ifstream &infile) {
-    string line;
-    while (getline(infile, line)) {
-        stringstream ss(line);
-        string name, type_str;
-        int filetype;
-        ss >> name >> filetype >> type_str;
-        fileNode node;
-        node.name = name;
-        node.filetype = filetype;
-        node.type[0] = type_str[0] == 'r';
-        node.type[1] = type_str[1] == 'w';
-        node.type[2] = type_str[2] == 'x';
-        node.father = this;
-        children.push_back(node);
-        if (filetype == 0) { // 文件夹
-            children.back().loadFromFile(infile);
-        }
-    }
-}
-
+		string line;
+		while (getline(infile, line)) {
+			stringstream ss(line);
+			string src;
+			int filetype;
+			ss >> src >> filetype;
+			fileNode node;
+			node.src = src;
+			node.name = src.substr(src.find_last_of("/") + 1);
+			node.filetype = filetype;
+			node.father = this;
+			children.push_back(node);
+			if (filetype == 0) { // 文件夹
+				children.back().loadFromFile(infile);
+			}
+		}
+	}
 };
 
 fileNode *recent_ptr;  //目前所在目录
@@ -269,9 +230,6 @@ void creatFile(string name)
 		IN.src = recent_ptr->src + "/" + name;
 		IN.grade = recent_grade + 1;
 		IN.filetype = 1;
-		IN.type[0] = true;
-		IN.type[1] = true;
-		IN.type[2] = true;
 		recent_ptr->children.push_back(IN);
 		ofstream filestream(name.data());
 		filestream.close();
@@ -334,9 +292,6 @@ void creatFolder(string name)
 		IN.src = recent_ptr->src + "/" + name;
 		IN.grade = recent_grade + 1;
 		IN.filetype = 0;
-		IN.type[0] = true;
-		IN.type[1] = true;
-		IN.type[2] = false;
 		recent_ptr->children.push_back(IN);
 		if (mkdir(name.data()) == 0)
 		{
@@ -353,12 +308,10 @@ void creatFolder(string name)
 		return;
 	}
 }
-
-//初始化
+// 初始化
 void init() {
     // 创建根目录
     {
-        root.owner = "all";
         root.filetype = 0;
         root.src = "./root";
         root.grade = 0;
@@ -371,7 +324,7 @@ void init() {
                 root.loadFromFile(infile);
                 infile.close();
             } else {
-                cout << "无法打开文件系统状态文件" << endl;
+                cout << "无法打开文件系统状态文件，或者file-system.txt文件不存在" << endl;
             }
         } else {
             chdir("root");
@@ -439,9 +392,9 @@ void dir()
 {
 	if (recent_ptr->children.size() != 0)
 	{
-		cout << left << setw(18) << "文件名" << left << setw(25) << "文件所有者" << left << setw(36) << "文件读写类型" << left << setw(24) << "文件地址" << left << setw(19) << "文件大小" << endl;
+		cout << left << setw(18) << "文件名" << left << setw(24) << "文件地址" << left << setw(19) << "文件大小" << endl;
 		for (auto i = recent_ptr->children.begin(); i != recent_ptr->children.end(); i++)
-			cout << left << setw(15) << (*i).name << left << setw(20) << (*i).owner << left << setw(30) << (*i).print_type() << left << setw(20) << (*i).src << left << setw(15) << (*i).fileSize() << endl;
+			cout << left << setw(15) << (*i).name << left << setw(20) << (*i).src << left << setw(15) << (*i).fileSize() << endl;
 	}
 	else
 	{
@@ -550,7 +503,7 @@ void exit() {
         root.saveToFile(outfile);
         outfile.close();
     } else {
-        cout << "无法打开文件来保存文件系统状态 或未找到file-system.txt" << endl;
+        cout << "无法打开文件来保存文件系统状态，或未找到file-system.txt" << endl;
     }
     
     for (int i = recent_grade + 1; i != 0; i--) {
