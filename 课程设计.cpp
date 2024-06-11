@@ -121,7 +121,8 @@ void help()
     cout << "7. read + file_name 读取文件\n";
     cout << "8. delete + file_name 删除文件/文件夹\n";
     cout << "9. rename + old_name + new_name 重命名文件/文件夹\n";
-    cout << "10. exit 退出系统\n";
+	cout << "10. copy + source_file_name + target_file_name\n";
+    cout << "11. exit 退出系统\n";
     cout << "------------------------------------------------------------------------\n";
     cout << endl;
 }
