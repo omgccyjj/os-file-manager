@@ -369,9 +369,38 @@ void dir()
 	}
 }
 
+/* :"源文件路径 目的路径" */
 void copyFile(string filename_and_path)
 {
-	
+	string source_file, target_file;
+	for (auto i = 0; i < filename_and_path.size(); i++)
+	{
+		if (filename_and_path[i] == ' ')
+		{
+			source_file = filename_and_path.substr(0, i);
+			target_file = filename_and_path.substr(i + 1);
+			break;
+		}
+	}
+	if (!existRecentFolder(source_file))
+	{
+		cout << "源文件不存在" ;
+		return;
+	}
+	if (!existRecentFolder(target_file))
+	{
+		string I;
+		cout << "目标文件已存在" ;
+		cout << "是否覆盖<y, n>:" ;
+		cin >> I;
+		if (I != "y")
+		{
+			return;
+		}
+	}
+	string command = "copy " + filename_and_path;
+	system(command.data());
+	cout << "复制成功!";
 }
 
 //删除文件
