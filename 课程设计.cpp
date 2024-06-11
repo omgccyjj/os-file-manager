@@ -76,7 +76,37 @@ public:
 		else
 			a += "-x";
 		return a;
+	}
+	// 保存文件系统状态，用于持续化存储
+	void saveToFile(ofstream &outfile) {
+		outfile << name << " " << filetype << " " << print_type() << endl;
+		for (auto &child : children) {
+			child.saveToFile(outfile);
+		}
+	}
+
+	// 加载文件系统状态
+	void loadFromFile(ifstream &infile) {
+    string line;
+    while (getline(infile, line)) {
+        stringstream ss(line);
+        string name, type_str;
+        int filetype;
+        ss >> name >> filetype >> type_str;
+        fileNode node;
+        node.name = name;
+        node.filetype = filetype;
+        node.type[0] = type_str[0] == 'r';
+        node.type[1] = type_str[1] == 'w';
+        node.type[2] = type_str[2] == 'x';
+        node.father = this;
+        children.push_back(node);
+        if (filetype == 0) { // 文件夹
+            children.back().loadFromFile(infile);
+        }
+    }
 }
+
 };
 
 fileNode *recent_ptr;  //目前所在目录
@@ -125,6 +155,7 @@ void help()
     cout << "------------------------------------------------------------------------\n";
     cout << endl;
 }
+
 
 
 //扫描输入的文件是否在当前目录中
@@ -285,20 +316,30 @@ void creatFolder(string name)
 }
 
 //初始化
-void init()
-{
-	//创建根目录
-	{
-		root.owner = "all";
-		root.filetype = 0;
-		root.src = "./root";
-		root.grade = 0;
-		root.name = "root";
-		system("mkdir root");
-		chdir("root");
-		recent_grade = root.grade;
-		recent_ptr = &root;
-	}
+void init() {
+    // 创建根目录
+    {
+        root.owner = "all";
+        root.filetype = 0;
+        root.src = "./root";
+        root.grade = 0;
+        root.name = "root";
+        if (mkdir("root") != 0) {
+            cout << "根目录已存在，尝试加载文件系统状态" << endl;
+            chdir("root");
+            ifstream infile("filesystem.txt");
+            if (infile.is_open()) {
+                root.loadFromFile(infile);
+                infile.close();
+            } else {
+                cout << "无法打开文件系统状态文件" << endl;
+            }
+        } else {
+            chdir("root");
+        }
+        recent_grade = root.grade;
+        recent_ptr = &root;
+    }
 }
 
 
@@ -434,17 +475,25 @@ void renameFile(string option)
 }
 
 //退出
-void exit()
-{
-	for (int i= recent_grade+1; i != 0; i--)
-	{
-		chdir("..");
-	}
+void exit() {
+	// 调用文件系统存储，保存文件系统状态
+    ofstream outfile("file-system.txt");
+    if (outfile.is_open()) {
+        root.saveToFile(outfile);
+        outfile.close();
+    } else {
+        cout << "无法打开文件来保存文件系统状态 或未找到file-system.txt" << endl;
+    }
+    
+    for (int i = recent_grade + 1; i != 0; i--) {
+        chdir("..");
+    }
 
-	// system("rm -rf root");
-	cout << "目录删除成功!即将退出系统."<<endl;
-	exit(0);
+    // system("rm -rf root");
+    cout << "目录删除成功!即将退出系统." << endl;
+    exit(0);
 }
+
 //命令解释
 void shell()
 {
